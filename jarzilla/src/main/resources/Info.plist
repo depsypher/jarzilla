@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+	<key>CFBundleName</key>
+	<string>Jarzilla</string>
+	<key>CFBundleVersion</key>
+	<string>0.1.0</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<string>true</string>
+	<key>CFBundleExecutable</key>
+	<string>JavaApplicationStub</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>jarzilla.icns</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+	    <dict>
+	        <key>CFBundleTypeExtensions</key>
+	        <array>
+				<string>ear</string>
+	            <string>jar</string>
+				<string>sar</string>
+	            <string>war</string>
+				<string>zip</string>
+	        </array>
+	        <key>CFBundleTypeName</key>
+	        <string>Jarzilla File</string>
+	        <key>CFBundleTypeRole</key>
+	        <string>Viewer</string>
+	    </dict>
+	</array>
+	<key>Java</key>
+	<dict>
+		<key>MainClass</key>
+		<string>com.googlecode.jarzilla.Jarzilla</string>
+		<key>JVMVersion</key>
+		<string>1.5+</string>
+		<key>ClassPath</key>
+		<string>$JAVAROOT/jarzilla.jar:$JAVAROOT/forms-1.2.1.jar:$JAVAROOT/mac_widgets.jar:$JAVAROOT/swingx-1.6.jar:$JAVAROOT/quaqua-filechooser-only.jar</string>
+	</dict>
+</dict>
+</plist>
