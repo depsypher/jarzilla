@@ -1,0 +1,60 @@
+<!--
+Schlepit
+-->
+<project name="schlepit" default="dist">
+
+	<property file="build.properties" />
+
+	<property name="schlepit.version" value="0.1.0" />
+	<property name="schlepit.mainClass" value="com.googlecode.schlepit.Schlepper" />
+
+	<path id="schlepit.classpath">
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!--
+	Cleans up
+	-->
+	<target name="clean" description="Removes all generated files">
+		<delete dir="build" quiet="true" />
+		<delete dir="dist" quiet="true" />
+	</target>
+
+	<!--
+	Compiles the code
+	-->
+	<target name="compile" description="Compiles the code">
+		<mkdir dir="build/schlepit/classes" />
+		<javac srcdir="src/main/java" destdir="build/schlepit/classes" debug="on" target="1.5">
+			<classpath refid="schlepit.classpath" />
+		</javac>
+	</target>
+
+	<!--
+	Builds the app
+	-->
+	<target name="dist" description="Builds the app" depends="compile">
+		<mkdir dir="dist" />
+		<!--copy file="doc/changelog.markdown" tofile="build/changelog.txt" /-->
+		<jar destfile="dist/schlepit.jar">
+			<fileset dir="build/schlepit/classes" />
+			<!--fileset dir="build" includes="changelog.txt" /-->
+			<manifest>
+				<attribute name="Main-Class" value="${schlepit.mainClass}" />
+				<attribute name="Schlepit-Version" value="${schlepit.version}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="test">
+		<taskdef name="schlepit"
+				classname="com.googlecode.jarzilla.schlepit.build.SchlepItTask"
+				classpath="dist/schlepit.jar" />
+
+		<zip destfile="dist/test.zip" basedir="src/main/java" />
+		<schlepit version="${schlepit.version}" fileName="package.schlep" source="dist/test.zip" dest="dist/" />
+	</target>
+
+</project>
