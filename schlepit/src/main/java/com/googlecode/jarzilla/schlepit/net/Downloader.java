@@ -18,7 +18,7 @@ public abstract class Downloader extends Thread
 	/**
 	 * milliseconds between notifying progress observers of file download progress.
 	 */
-	protected static final long UPDATE_INTERVAL = 100L;
+	protected static final long UPDATE_INTERVAL = 200L;
 
 	/** */
 	protected DownloadObserver observer;
