@@ -52,9 +52,9 @@ Jarzilla
 			</manifest>
 		</jar>
 
-	    <property name="appdir" value="dist/Jarzilla.app"/>
-	    <mkdir dir="${appdir}/Contents/MacOS"/>
-	    <mkdir dir="${appdir}/Contents/Resources/Java"/>
+		<property name="appdir" value="dist/Jarzilla.app"/>
+		<mkdir dir="${appdir}/Contents/MacOS"/>
+		<mkdir dir="${appdir}/Contents/Resources/Java"/>
 
 		<copy file="src/main/resources/JavaApplicationStub" todir="${appdir}/Contents/MacOS"/>
 		<exec executable="chmod">
@@ -66,16 +66,25 @@ Jarzilla
 		<copy file="src/main/resources/jarzilla.icns" todir="${appdir}/Contents/Resources" />
 		<copy file="dist/jarzilla.jar" todir="${appdir}/Contents/Resources/Java" />
 		<copy todir="${appdir}/Contents/Resources/Java">
-		    <fileset dir="lib/runtime">
-		        <include name="*.jar" />
-		    	<include name="*.jnilib" />
-		    </fileset>
+			<fileset dir="lib/runtime">
+				<include name="*.jar" />
+				<include name="*.jnilib" />
+			</fileset>
 		</copy>
 		<exec executable="/Developer/Tools/SetFile">
 			<arg value="-a" />
 			<arg value="B" />
 			<arg value="${appdir}" />
 		</exec>
+
+		<copy file="src/main/resources/updater/schlepit.properties" todir="${appdir}" />
+
+		<taskdef name="schlepit"
+				classname="com.googlecode.jarzilla.schlepit.build.SchlepItTask"
+				classpath="lib/runtime/schlepit.jar" />
+
+		<zip destfile="dist/update.zip" basedir="${appdir}" />
+		<schlepit version="${jarzilla.version}" fileName="jarzilla.schlepit" source="dist/update.zip" dest="dist/" />
 	</target>
 
 	<!--
@@ -83,24 +92,42 @@ Jarzilla
 	-->
 	<target name="publish" depends="clean, dist">
 		<!-- create dmg -->
-		<copy file="${basedir}/src/main/resources/template.dmg" todir="${basedir}/dist" />
+		<copy file="src/main/resources/template.dmg" todir="${basedir}/dist" />
 		<exec executable="hdiutil" dir="${basedir}/dist"><arg line="attach template.dmg"/></exec>
 		<exec executable="cp"><arg line="-r ${basedir}/dist/Jarzilla.app /Volumes/Jarzilla"/></exec>
 		<exec executable="hdiutil"><arg line="detach /Volumes/Jarzilla"/></exec>
-		<exec executable="hdiutil" dir="${basedir}/dist"><arg line='convert "template.dmg" -format UDZO -imagekey zlib-level=9 -o "Jarzilla.dmg"' /></exec>
+		<exec executable="hdiutil" dir="${basedir}/dist">
+			<arg line='convert "template.dmg" -format UDZO -imagekey zlib-level=9 -o "Jarzilla.dmg"' />
+		</exec>
+
+		<input message="Publishing to googlecode: continue (y/n)?"
+				validargs="y,n"
+				addproperty="do.publish" />
+
+		<condition property="do.abort">
+			<equals arg1="n" arg2="${do.publish}"/>
+		</condition>
+		<fail if="do.abort">Publishing aborted.</fail>
 
 		<taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="lib/compile/ant-googlecode-0.0.2.jar" name="gcupload"/>
 		<property file="google.properties" />
 		<gcupload
-		        username="${google.username}"
-		        password="${google.password}"
-		        projectname="jarzilla"
-		        filename="dist/jarzilla.dmg"
-		        targetfilename="Jarzilla.dmg"
-		        summary="Jarzilla version ${jarzilla.version}"
-		        labels="Featured"
+				username="${google.username}"
+				password="${google.password}"
+				projectname="jarzilla"
+				filename="dist/jarzilla.dmg"
+				targetfilename="Jarzilla.dmg"
+				summary="Jarzilla version ${jarzilla.version}"
+				labels="Featured"
+				verbose="true" />
+		<gcupload
+				username="${google.username}"
+				password="${google.password}"
+				projectname="jarzilla"
+				filename="dist/jarzilla.schlepit"
+				targetfilename="jarzilla.schlepit"
+				summary="Jarzilla auto update package for version ${jarzilla.version}"
 				verbose="true" />
 	</target>
-
 
 </project>

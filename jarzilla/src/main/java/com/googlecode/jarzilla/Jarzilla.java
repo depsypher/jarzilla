@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -46,9 +48,13 @@ import com.explodingpixels.macwidgets.UnifiedToolBar;
 import com.googlecode.jarzilla.core.ArchiveFile;
 import com.googlecode.jarzilla.core.ArchiveFileEntry;
 import com.googlecode.jarzilla.core.Utils;
+import com.googlecode.jarzilla.schlepit.Schlepper;
+import com.googlecode.jarzilla.schlepit.net.DownloadObserver;
+import com.googlecode.jarzilla.schlepit.net.Downloader;
 import com.googlecode.jarzilla.ui.DetailsMessageBox;
 import com.googlecode.jarzilla.ui.JarzillaBottomBar;
 import com.googlecode.jarzilla.ui.ResultsPanel;
+import com.googlecode.jarzilla.ui.UpdateDialog;
 
 /**
  * Jarzilla application class
@@ -171,6 +177,98 @@ public class Jarzilla
 				System.exit(0);
 			}
 		});
+
+		// update
+		try
+		{
+			Jarzilla.update();
+		}
+		catch (Exception e)
+		{
+			// silent
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public static void update() throws Exception
+	{
+		Schlepper schlepper = new Schlepper();
+		String path = schlepper.getDirectory(Jarzilla.class);
+		path = path.substring(0, path.indexOf("Jarzilla.app") + 13);
+
+		Properties props = schlepper.getProperties(path + "schlepit.properties");
+		String version = props.getProperty("version");
+		String updateUrl = props.getProperty("updateUrl");
+
+		System.out.println(path);
+		System.out.println("Version: " + version);
+		System.out.println("UpdateUrl: " + updateUrl);
+
+		DownloadObserver observer = new DownloadObserver()
+		{
+			private UpdateDialog updateDialog = new UpdateDialog();
+
+			@Override
+			public void onUpdateAvailable(final Downloader downloader)
+			{
+				updateDialog.setOkActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						updateDialog.setProgressVisible(true);
+						synchronized(downloader)
+						{
+							downloader.notify();
+						}
+					}
+				});
+				updateDialog.setNotNowActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						updateDialog.dispose();
+					}
+				});
+				updateDialog.setVisible(true);
+			}
+
+			@Override
+			public void onUpdateComplete(final Downloader downloader)
+			{
+				updateDialog.confirmRestart();
+				updateDialog.setRestartActionListener(new ActionListener()
+				{
+					@Override
+					public void actionPerformed(ActionEvent e)
+					{
+						synchronized(downloader)
+						{
+							downloader.notify();
+						}
+						updateDialog.dispose();
+					}
+				});
+			}
+
+			@Override
+			public boolean downloadProgress(int percentDone, long secondsLeft)
+			{
+				updateDialog.setProgress(percentDone);
+				return true;
+			}
+		};
+
+		boolean updated = schlepper.schlep(version, updateUrl, path, observer);
+		if (updated)
+		{
+			new ProcessBuilder("open", "-n", path).start();
+			Thread.sleep(500);
+			System.exit(0);
+		}
 	}
 
 	/** */
@@ -377,7 +475,10 @@ public class Jarzilla
 
 			this.resultsPanel.setBusy(true);
 
-			List<ArchiveFileEntry> results = this.archiveFile.search(searchField.getText());
+			List<ArchiveFileEntry> results = (this.archiveFile == null)
+					? Collections.<ArchiveFileEntry>emptyList()
+					: this.archiveFile.search(searchField.getText());
+
 			found = results.size();
 			this.resultsPanel.setResults(results);
 		}
@@ -409,8 +510,8 @@ public class Jarzilla
 	 */
 	public static void messageBoxWithDetails(String title, String message, String details, int type)
 	{
-        DetailsMessageBox mb = new DetailsMessageBox(Jarzilla.frame, title, message, details, type);
-        mb.setVisible(true);
+		DetailsMessageBox mb = new DetailsMessageBox(Jarzilla.frame, title, message, details, type);
+		mb.setVisible(true);
 	}
 
 	/** */
