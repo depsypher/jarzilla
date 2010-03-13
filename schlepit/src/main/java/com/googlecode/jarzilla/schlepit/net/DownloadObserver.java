@@ -19,6 +19,13 @@ public interface DownloadObserver
 	public void onUpdateAvailable(Downloader downloader);
 
 	/**
+	 * Hook for handling user interaction after update is complete
+	 *
+	 * @param downloader
+	 */
+	public void onUpdateComplete(Downloader downloader);
+
+	/**
 	 * Report the download progress
 	 *
 	 * @param percent Percentage complete

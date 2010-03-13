@@ -85,6 +85,7 @@ public class HttpDownloader extends Downloader
 			if (newVersion.equals(currentVersion))
 				throw new DownloadException("Already up to date");
 
+			System.out.println("waiting for confirmation to download");
 			this.observer.onUpdateAvailable(this);
 			try
 			{
@@ -108,6 +109,21 @@ public class HttpDownloader extends Downloader
 				currentSize += read;
 				this.updateObserver();
 			}
+
+			System.out.println("waiting for confirmation to restart app");
+			this.observer.onUpdateComplete(this);
+			try
+			{
+				synchronized(this)
+				{
+					this.wait();
+				}
+			}
+			catch(InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+
 			HttpDownloader.unZip(tempZip, this.updateDir, crc);
 		}
 		catch(IOException e)
