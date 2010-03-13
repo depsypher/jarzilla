@@ -61,6 +61,7 @@ public abstract class Downloader extends Thread
 		}
 		catch (DownloadException e)
 		{
+			System.out.println("Download failed: " + e.getMessage());
 			return false;
 		}
 

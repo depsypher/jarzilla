@@ -46,6 +46,11 @@ public class HttpDownloader extends Downloader
 		try
 		{
 			this.totalDownloadSize = this.getFileSize(url);
+
+			// FIXME: for now hardcode to 3MB since getFileSize() fails
+			if (this.totalDownloadSize == -1)
+				this.totalDownloadSize = 3 * 1024 * 1024;
+
 			connection = (HttpURLConnection)url.openConnection();
 			connection.connect();
 
@@ -54,6 +59,7 @@ public class HttpDownloader extends Downloader
 		}
 		catch(IOException e)
 		{
+			System.out.println("Error connecting: " + e.getMessage());
 			throw new DownloadException("Error getting connection", e);
 		}
 
@@ -164,8 +170,9 @@ public class HttpDownloader extends Downloader
 		connection.setRequestMethod("HEAD");
 		connection.connect();
 
-		if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
-			throw new IOException("Unable to check up-to-date for " +	url + ": " + connection.getResponseCode());
+//	TODO: figure out why this is a 404 against googlecode's download area... getConnectionLength() returns -1
+//		if (connection.getResponseCode() != HttpURLConnection.HTTP_OK)
+//			throw new IOException("Unable to check up-to-date for " +	url + ": " + connection.getResponseCode());
 
 		try
 		{
