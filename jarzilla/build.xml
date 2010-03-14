@@ -115,18 +115,18 @@ Jarzilla
 				username="${google.username}"
 				password="${google.password}"
 				projectname="jarzilla"
-				filename="dist/jarzilla.dmg"
-				targetfilename="Jarzilla.dmg"
-				summary="Jarzilla version ${jarzilla.version}"
-				labels="Featured"
+				filename="dist/jarzilla.schlepit"
+				targetfilename="jarzilla.schlepit"
+				summary="Jarzilla auto update package for version ${jarzilla.version}"
 				verbose="true" />
 		<gcupload
 				username="${google.username}"
 				password="${google.password}"
 				projectname="jarzilla"
-				filename="dist/jarzilla.schlepit"
-				targetfilename="jarzilla.schlepit"
-				summary="Jarzilla auto update package for version ${jarzilla.version}"
+				filename="dist/jarzilla.dmg"
+				targetfilename="Jarzilla.dmg"
+				summary="Jarzilla version ${jarzilla.version}"
+				labels="Featured"
 				verbose="true" />
 	</target>
 
