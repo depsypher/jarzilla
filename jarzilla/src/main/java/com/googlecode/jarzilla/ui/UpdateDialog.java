@@ -29,6 +29,7 @@ public class UpdateDialog extends JDialog
 {
 	private JProgressBar progressBar;
 	private JPanel controlPanel = new JPanel();
+	private JLabel text = new JLabel();
 	private JButton okButton = new JButton("OK");
 	private JButton notNowButton = new JButton("Not Now");
 	private JButton restartButton = new JButton("Restart");
@@ -45,7 +46,7 @@ public class UpdateDialog extends JDialog
 		JPanel messagePanel = new JPanel(new BorderLayout(20, 20));
 		messagePanel.setPreferredSize(new Dimension(400, 200));
 
-		JLabel text = new JLabel("A new update is available.  Click OK to download.");
+		text.setText("A new update is available.  Click OK to download.");
 		text.setHorizontalAlignment(SwingConstants.CENTER);
 		messagePanel.add(text, BorderLayout.NORTH);
 		messagePanel.add(this.progressBar, BorderLayout.CENTER);
@@ -70,7 +71,11 @@ public class UpdateDialog extends JDialog
 	/** */
 	public void setProgressVisible(boolean visible)
 	{
+		this.text.setText("Downloading...");
 		this.progressBar.setVisible(visible);
+		this.controlPanel.removeAll();
+		this.validate();
+		this.repaint();
 	}
 
 	/** */
@@ -94,10 +99,12 @@ public class UpdateDialog extends JDialog
 	/** */
 	public void confirmRestart()
 	{
+		this.text.setText("Done");
+		this.progressBar.setVisible(false);
 		this.controlPanel.removeAll();
 		this.controlPanel.add(this.restartButton);
-		this.controlPanel.validate();
-		this.controlPanel.repaint();
+		this.validate();
+		this.repaint();
 	}
 
 	/**
