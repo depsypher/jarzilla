@@ -196,7 +196,7 @@ public class codeAttr extends attrInfo {
     containing the local variable name declarations.  There should
     be only one localVarTabAttr in the codeAttributes table.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   public Vector getLocalVarVec()
   {
       Vector varVec = null;

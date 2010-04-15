@@ -936,7 +936,7 @@ class methodInfo extends dataRead implements access_and_modifier_flags {
     and any local variables.
 
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   void pr() {
     final String indent1 = "   ";
     final String indent2 = "     ";

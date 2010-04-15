@@ -218,7 +218,7 @@ class localVarTabAttr extends attrInfo {
   }
 
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public Vector getLocalVarVec() {
     Vector localVarVec = null;
     String localDecl;
