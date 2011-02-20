@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
@@ -185,7 +186,7 @@ public class Jarzilla
 		}
 		catch (Exception e)
 		{
-			// silent
+			System.out.println("Update error: " + e.getMessage());
 		}
 	}
 
@@ -197,14 +198,45 @@ public class Jarzilla
 		Schlepper schlepper = new Schlepper();
 		String path = schlepper.getDirectory(Jarzilla.class);
 		path = path.substring(0, path.indexOf("Jarzilla.app") + 13);
+		String propertiesPath = path + "schlepit.properties";
 
-		Properties props = schlepper.getProperties(path + "schlepit.properties");
+		Properties props = schlepper.getProperties(propertiesPath);
 		String version = props.getProperty("version");
 		String updateUrl = props.getProperty("updateUrl");
+		String lastUpdateCheck = props.getProperty("lastUpdateCheck");
 
 		System.out.println(path);
 		System.out.println("Version: " + version);
 		System.out.println("UpdateUrl: " + updateUrl);
+		System.out.println("lastUpdateCheck: " + lastUpdateCheck);
+
+		long millis = 0;
+		if (lastUpdateCheck != null)
+		{
+			try
+			{
+				millis = Long.valueOf(lastUpdateCheck);
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+		}
+
+		long elapsed = new Date().getTime() - millis;
+
+		// update last update check time once a month
+		if (millis == 0 || elapsed >= 2628000000L) {
+			props.setProperty("lastUpdateCheck", Long.valueOf(new Date().getTime()).toString());
+			schlepper.setProperties(propertiesPath, props);
+		}
+
+		// if a month hasn't passed yet, don't check for update
+		if (elapsed < 2628000000L)
+		{
+			System.out.println("Canceling update check, not enough time elapsed: " + elapsed);
+			return;
+		}
 
 		DownloadObserver observer = new DownloadObserver()
 		{
@@ -460,7 +492,7 @@ public class Jarzilla
 			}
 			else
 			{
-				//ignore
+				// ignore
 			}
 		}
 	}
