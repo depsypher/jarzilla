@@ -5,7 +5,9 @@
 package com.googlecode.jarzilla.schlepit;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -48,6 +50,36 @@ public class Schlepper
 			return properties;
 		}
 		catch(IOException e) {  }
+
+		return null;
+	}
+
+	/** */
+	public Properties setProperties(String filePath, Properties properties)
+	{
+		OutputStream os = null;
+		try
+		{
+			System.out.println("Saving to " + filePath);
+			os = new FileOutputStream(filePath);
+			properties.store(os, "Schlepit properties");
+			return properties;
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (os != null)
+			{
+				try {
+					os.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+		}
 
 		return null;
 	}
