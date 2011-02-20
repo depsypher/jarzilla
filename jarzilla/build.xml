@@ -27,7 +27,7 @@ Jarzilla
 	-->
 	<target name="compile" description="Compiles the code">
 		<mkdir dir="build/jarzilla/classes" />
-		<javac srcdir="src/main/java" destdir="build/jarzilla/classes" debug="on" target="1.5">
+		<javac srcdir="src/main/java" destdir="build/jarzilla/classes" debug="on" target="1.5" includeantruntime="false">
 			<classpath refid="jarzilla.classpath" />
 		</javac>
 		<copy todir="build/jarzilla/classes">
