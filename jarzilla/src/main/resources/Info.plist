@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
-<plist version="0.9">
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
 	<string>Jarzilla</string>
 	<key>CFBundleVersion</key>
-	<string>0.1.0</string>
+	<string>0.1.1</string>
 	<key>CFBundleAllowMixedLocalizations</key>
 	<string>true</string>
 	<key>CFBundleExecutable</key>
@@ -15,11 +15,13 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
-	<string>????</string>
+	<string>JARZ</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleIconFile</key>
 	<string>jarzilla.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.googlecode.jarzilla</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 	    <dict>
@@ -31,8 +33,15 @@
 	            <string>war</string>
 				<string>zip</string>
 	        </array>
+	        <key>CFBundleTypeIconFile</key>
+			<string>jarzilla.icns</string>
 	        <key>CFBundleTypeName</key>
 	        <string>Jarzilla File</string>
+			<key>LSItemContentTypes</key>
+        	<array>
+				<string>com.sun.java-archive</string>
+				<string>com.pkware.zip-archive</string>
+			</array>
 	        <key>CFBundleTypeRole</key>
 	        <string>Viewer</string>
 	    </dict>
