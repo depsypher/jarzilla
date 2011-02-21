@@ -114,6 +114,9 @@ public class Jarzilla
 		AbstractButton folderButton = MacButtonFactory.makeUnifiedToolBarButton(
 				new JButton("Open", new ImageIcon(Jarzilla.class.getResource("/com/googlecode/jarzilla/folder.png"))));
 
+		AbstractButton runButton = MacButtonFactory.makeUnifiedToolBarButton(
+				new JButton("Run", new ImageIcon(Jarzilla.class.getResource("/com/googlecode/jarzilla/start-here.png"))));
+
 		AbstractButton helpButton = MacButtonFactory.makeUnifiedToolBarButton(
 				new JButton("Help", new ImageIcon(Jarzilla.class.getResource("/com/googlecode/jarzilla/help-browser.png"))));
 
@@ -134,8 +137,31 @@ public class Jarzilla
 			}
 		});
 
+		runButton.setActionCommand("pressed");
+		runButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if ("pressed".equals(e.getActionCommand()))
+				{
+					try
+					{
+						String jarName = Jarzilla.jarzilla.archiveFile.getArchiveFilePath();
+						System.out.println("running " + jarName);
+						new ProcessBuilder("open", "-n", "/System/Library/CoreServices/Jar Launcher.app", jarName).start();
+					}
+					catch (IOException e1)
+					{
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+
 		UnifiedToolBar toolBar = new UnifiedToolBar();
 		toolBar.addComponentToLeft(folderButton);
+		toolBar.addComponentToLeft(runButton);
 		toolBar.addComponentToLeft(helpButton);
 		toolBar.installWindowDraggerOnWindow(frame);
 
