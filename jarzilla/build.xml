@@ -3,7 +3,7 @@ Jarzilla
 -->
 <project name="jarzilla" default="dist">
 
-	<property file="build.properties" />
+	<property file="google.properties" />
 
 	<property name="jarzilla.version" value="0.1.1" />
 	<property name="jarzilla.mainClass" value="com.googlecode.jarzilla.Jarzilla" />
