@@ -463,6 +463,8 @@ public class Jarzilla
 		};
 
 		new Thread(r, "Parsing Thread").start();
+
+		searchField.setText("");
 	}
 
 	/** */
