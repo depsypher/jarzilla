@@ -149,7 +149,7 @@ public class Jarzilla
 					{
 						String jarName = Jarzilla.jarzilla.archiveFile.getArchiveFilePath();
 						System.out.println("running " + jarName);
-						new ProcessBuilder("open", "-n", "/System/Library/CoreServices/Jar Launcher.app", jarName).start();
+						new ProcessBuilder("java", "-jar", jarName).start();
 					}
 					catch (IOException e1)
 					{
