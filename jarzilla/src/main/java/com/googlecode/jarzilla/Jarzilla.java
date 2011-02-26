@@ -38,9 +38,14 @@ import javax.swing.UIManager;
 
 import ch.randelshofer.quaqua.QuaquaManager;
 
+import com.apple.eawt.AppEvent.OpenFilesEvent;
+import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;
 import com.apple.eawt.ApplicationAdapter;
 import com.apple.eawt.ApplicationEvent;
+import com.apple.eawt.OpenFilesHandler;
+import com.apple.eawt.QuitHandler;
+import com.apple.eawt.QuitResponse;
 import com.explodingpixels.macwidgets.BottomBarSize;
 import com.explodingpixels.macwidgets.LabeledComponentGroup;
 import com.explodingpixels.macwidgets.MacButtonFactory;
@@ -62,6 +67,7 @@ import com.googlecode.jarzilla.ui.UpdateDialog;
  *
  * @author rayvanderborght
  */
+@SuppressWarnings("deprecation")
 public class Jarzilla
 {
 	private static final String APP_NAME = "Jarzilla";
@@ -189,21 +195,47 @@ public class Jarzilla
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setVisible(true);
 
-		app.addApplicationListener(new ApplicationAdapter()
+		try
 		{
-			@Override
-			public void handleOpenFile(ApplicationEvent event)
+			app.setOpenFileHandler(new OpenFilesHandler()
 			{
-				File file = new File(event.getFilename());
-				Jarzilla.this.scanPath(file);
-			}
+				@Override
+				public void openFiles(OpenFilesEvent event)
+				{
+					File file = event.getFiles().get(0);
+					Jarzilla.this.scanPath(file);
+				}
+			});
+			app.setQuitHandler(new QuitHandler()
+			{
+				@Override
+				public void handleQuitRequestWith(QuitEvent event, QuitResponse response)
+				{
+					System.exit(0);
+				}
+			});
+		}
+		catch (Exception e)
+		{
+			// assuming this will make things backwards compatible with older
+			// versions.. aka the above api was added in Java for Mac OS X 10.6
+			// Update 3, Java for Mac OS X 10.5 Update 8
+			app.addApplicationListener(new ApplicationAdapter()
+			{
+				@Override
+				public void handleOpenFile(ApplicationEvent event)
+				{
+					File file = new File(event.getFilename());
+					Jarzilla.this.scanPath(file);
+				}
 
-			@Override
-			public void handleQuit(ApplicationEvent event)
-			{
-				System.exit(0);
-			}
-		});
+				@Override
+				public void handleQuit(ApplicationEvent event)
+				{
+					System.exit(0);
+				}
+			});
+		}
 
 		// update
 		try
