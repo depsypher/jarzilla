@@ -33,6 +33,7 @@ Jarzilla
 		<copy todir="build/jarzilla/classes">
 			<fileset dir="src/main/java">
 				<include name="**/*.png" />
+				<include name="**/*help.html" />
 			</fileset>
 		</copy>
 	</target>
