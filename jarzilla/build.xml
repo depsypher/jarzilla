@@ -130,8 +130,8 @@ Jarzilla
 				username="${google.username}"
 				password="${google.password}"
 				projectname="jarzilla"
-				filename="dist/jarzilla.dmg"
-				targetfilename="Jarzilla.dmg"
+				filename="dist/jarzilla-${jarzilla.version}.dmg"
+				targetfilename="Jarzilla-${jarzilla.version}.dmg"
 				summary="Jarzilla version ${jarzilla.version}"
 				labels="Featured"
 				verbose="true" />
