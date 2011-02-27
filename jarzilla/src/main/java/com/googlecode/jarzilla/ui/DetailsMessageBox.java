@@ -105,15 +105,15 @@ public class DetailsMessageBox extends JDialog
 
         //get the specified icon from the UIDefaults
         Icon icon;
-        if(JOptionPane.ERROR_MESSAGE == type)
+        if (JOptionPane.ERROR_MESSAGE == type)
         {
             icon = (Icon)UIManager.get("OptionPane.errorIcon");
         }
-        else if(JOptionPane.INFORMATION_MESSAGE == type)
+        else if (JOptionPane.INFORMATION_MESSAGE == type)
         {
             icon = (Icon)UIManager.get("OptionPane.informationIcon");
         }
-        else if(JOptionPane.WARNING_MESSAGE == type)
+        else if (JOptionPane.WARNING_MESSAGE == type)
         {
             icon = (Icon)UIManager.get("OptionPane.warningIcon");
         }

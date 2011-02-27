@@ -58,6 +58,7 @@ import com.googlecode.jarzilla.schlepit.Schlepper;
 import com.googlecode.jarzilla.schlepit.net.DownloadObserver;
 import com.googlecode.jarzilla.schlepit.net.Downloader;
 import com.googlecode.jarzilla.ui.DetailsMessageBox;
+import com.googlecode.jarzilla.ui.HelpDialog;
 import com.googlecode.jarzilla.ui.JarzillaBottomBar;
 import com.googlecode.jarzilla.ui.ResultsPanel;
 import com.googlecode.jarzilla.ui.UpdateDialog;
@@ -161,6 +162,21 @@ public class Jarzilla
 					{
 						e1.printStackTrace();
 					}
+				}
+			}
+		});
+
+		helpButton.setActionCommand("pressed");
+		helpButton.addActionListener(new ActionListener()
+		{
+			private HelpDialog helpDialog = new HelpDialog();
+
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if ("pressed".equals(e.getActionCommand()))
+				{
+					helpDialog.setVisible(true);
 				}
 			}
 		});
