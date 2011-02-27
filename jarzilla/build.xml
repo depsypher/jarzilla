@@ -5,7 +5,7 @@ Jarzilla
 
 	<property file="google.properties" />
 
-	<property name="jarzilla.version" value="0.1.1" />
+	<property name="jarzilla.version" value="0.1.2" />
 	<property name="jarzilla.mainClass" value="com.googlecode.jarzilla.Jarzilla" />
 
 	<path id="jarzilla.classpath">
@@ -64,6 +64,13 @@ Jarzilla
 
 		<copy file="src/main/resources/Info.plist" todir="${appdir}/Contents" />
 		<copy file="src/main/resources/jarzilla.icns" todir="${appdir}/Contents/Resources" />
+
+		<copy file="src/main/resources/jad" todir="${appdir}/Contents/Resources" />
+		<exec executable="chmod">
+			<arg value="755" />
+			<arg value="${appdir}/Contents/Resources/jad" />
+		</exec>
+
 		<copy file="dist/jarzilla.jar" todir="${appdir}/Contents/Resources/Java" />
 		<copy todir="${appdir}/Contents/Resources/Java">
 			<fileset dir="lib/runtime">

@@ -46,7 +46,6 @@ import com.explodingpixels.macwidgets.IAppWidgetFactory;
 import com.explodingpixels.macwidgets.plaf.ITunesTableUI;
 import com.googlecode.jarzilla.Jarzilla;
 import com.googlecode.jarzilla.core.ArchiveFileEntry;
-import com.googlecode.jarzilla.core.ClassFileInfo;
 import com.googlecode.jarzilla.core.Utils;
 
 /**
@@ -58,15 +57,12 @@ import com.googlecode.jarzilla.core.Utils;
 public class ResultsPanel extends JPanel
 {
 	/** */
-	private static final DateFormat dateFormatter = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT);
-
-	/** */
 	private final JList resultList = new JList(new DefaultListModel());
 	private final JTable table;
 	private final JarzillaHeader header;
 
 	/** */
-	public ResultsPanel()
+	public ResultsPanel(final Jarzilla jarzilla)
 	{
 		this.setLayout(new BorderLayout());
 
@@ -139,7 +135,7 @@ public class ResultsPanel extends JPanel
 						List<File> files = (List<File>)data.getTransferData(DataFlavor.javaFileListFlavor);
 						for (File file : files)
 						{
-							Jarzilla.jarzilla.scanPath(file);
+							jarzilla.scanPath(file);
 						}
 					}
 				}
@@ -232,27 +228,11 @@ public class ResultsPanel extends JPanel
 			JTable t = ResultsPanel.this.table;
 			ArchiveFileEntry classInfo = (ArchiveFileEntry)t.getModel().getValueAt(t.getSelectedRow(), t.getSelectedColumn());
 
-			if (classInfo.getEntryFilePath().endsWith(".class"))
-			{
-				ClassFileInfo c = Utils.createFully(classInfo.getArchiveFilePath(), classInfo.getEntryFilePath(), classInfo.getFileTime(), classInfo.getFileSize());
-				ClassExplorer explorerDialog = new ClassExplorer(Jarzilla.getFrame(), c);
-				explorerDialog.getJDialog().setSize(640, 480);
-				explorerDialog.getJDialog().setLocationRelativeTo(null);
-				explorerDialog.getJDialog().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				explorerDialog.getJDialog().setVisible(true);
-			}
-			else //show any other resource property file, manifest, etc.
-			{
-				ResourceExplorer resourceExplorerDialog = new ResourceExplorer(
-						Jarzilla.getFrame(),
-						classInfo.getArchiveFilePath(),
-						classInfo.getEntryFilePath());
-
-				resourceExplorerDialog.getJDialog().setSize(640, 480);
-				resourceExplorerDialog.getJDialog().setLocationRelativeTo(null);
-				resourceExplorerDialog.getJDialog().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				resourceExplorerDialog.getJDialog().setVisible(true);
-			}
+			ResourceExplorer resourceExplorerDialog = new ResourceExplorer(Jarzilla.getFrame(), classInfo);
+			resourceExplorerDialog.getJDialog().setSize(640, 480);
+			resourceExplorerDialog.getJDialog().setLocationRelativeTo(null);
+			resourceExplorerDialog.getJDialog().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			resourceExplorerDialog.getJDialog().setVisible(true);
 		}
 		catch (Exception e)
 		{
@@ -302,8 +282,8 @@ public class ResultsPanel extends JPanel
 			}
 			else
 			{
-				String date = dateFormatter.format(new Date(info.getFileTime()));
-				this.setText(date);
+				Date date = new Date(info.getFileTime());
+				this.setText(DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(date));
 			}
 		}
 	}
@@ -311,7 +291,6 @@ public class ResultsPanel extends JPanel
 	/** */
 	private static class ResultSizeRenderer extends DefaultTableCellRenderer
 	{
-		private static final DecimalFormat DECIMAL = new DecimalFormat("#.##");
 		private static final double ONE_KB = 1024;
 		private static final double ONE_MB = 1024 * 1024;
 		private static final double ONE_GB = 1024 * 1024 * 1024;
@@ -339,15 +318,15 @@ public class ResultsPanel extends JPanel
 				}
 				else if (info.getFileSize() < 1024 * 1024)
 				{
-					this.setText(DECIMAL.format(info.getFileSize() / ONE_KB) + " KB");
+					this.setText(new DecimalFormat("#.##").format(info.getFileSize() / ONE_KB) + " KB");
 				}
 				else if (info.getFileSize() < 1024 * 1024 * 1024)
 				{
-					this.setText(DECIMAL.format(info.getFileSize() / ONE_MB) + " MB");
+					this.setText(new DecimalFormat("#.##").format(info.getFileSize() / ONE_MB) + " MB");
 				}
 				else
 				{
-					this.setText(DECIMAL.format(info.getFileSize() / ONE_GB) + " GB");
+					this.setText(new DecimalFormat("#.##").format(info.getFileSize() / ONE_GB) + " GB");
 				}
 			}
 		}

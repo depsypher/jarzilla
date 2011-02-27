@@ -111,7 +111,7 @@ public class Jarzilla
 		Jarzilla.frame.setTitle(APP_NAME);
 
 		this.fileChooser = new JFileChooser();
-		this.resultsPanel = new ResultsPanel();
+		this.resultsPanel = new ResultsPanel(this);
 
 		this.bottomBar = new JarzillaBottomBar(BottomBarSize.LARGE);
 		this.bottomBar.installWindowDraggerOnWindow(frame);
@@ -154,7 +154,7 @@ public class Jarzilla
 				{
 					try
 					{
-						String jarName = Jarzilla.jarzilla.archiveFile.getArchiveFilePath();
+						String jarName = Jarzilla.this.archiveFile.getArchiveFilePath();
 						System.out.println("running " + jarName);
 						new ProcessBuilder("java", "-jar", jarName).start();
 					}

@@ -7,8 +7,16 @@ import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -23,12 +31,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
 import com.explodingpixels.macwidgets.HudWidgetFactory;
 import com.explodingpixels.macwidgets.HudWindow;
+import com.googlecode.jarzilla.core.ArchiveFileEntry;
+import com.googlecode.jarzilla.core.ClassFileInfo;
 import com.googlecode.jarzilla.core.Utils;
 
 /**
@@ -38,7 +52,7 @@ import com.googlecode.jarzilla.core.Utils;
  * are easier to read with monospaced font. HTML view renders HTML as in
  * browser, but also provides a second tab to see HTML source.
  *
- * @auther rayvanderborght
+ * @author rayvanderborght
  * @author Igor Polevoy
  */
 public class ResourceExplorer extends HudWindow
@@ -56,15 +70,47 @@ public class ResourceExplorer extends HudWindow
      * @throws IOException - thrown in case there is a problem reading the resource.
      */
     @SuppressWarnings("serial")
-    public ResourceExplorer(Frame owner, String jarFileName, String resourceName) throws IOException
+    public ResourceExplorer(Frame owner, ArchiveFileEntry fileInfo) throws IOException
     {
-        super(resourceName, owner);
+        super(fileInfo.getEntryFilePath(), owner);
 
         this.getContentPane().setLayout(new BorderLayout());
+
+        String jarFileName = fileInfo.getArchiveFilePath();
+        String resourceName = fileInfo.getEntryFilePath();
 
         if (resourceName.toLowerCase().endsWith(".html"))
         {
             this.buildForHTML(jarFileName, resourceName);
+        }
+        else if (resourceName.toLowerCase().endsWith(".class"))
+        {
+			URL url = new URL("jar:file:" + jarFileName + "!/" + resourceName);
+			BufferedInputStream in = new BufferedInputStream(url.openConnection().getInputStream());
+			File f = File.createTempFile("decompile", ".class");
+
+			try
+			{
+			    OutputStream os = new FileOutputStream(f);
+			    try
+			    {
+			        byte[] buffer = new byte[4096];
+			        for (int n; (n = in.read(buffer)) != -1;)
+			        {
+			        	os.write(buffer, 0, n);
+			        }
+			    }
+			    finally
+			    {
+			    	os.close();
+			    }
+			}
+			finally
+			{
+				in.close();
+			}
+
+			this.buildForClass(fileInfo, this.decompile(f));
         }
         else if (this.isImage(resourceName))
         {
@@ -170,6 +216,93 @@ public class ResourceExplorer extends HudWindow
     }
 
     /**
+     * Builds UI for displaying class files
+     *
+     * @param fileInfo
+     * @param source
+     * @throws IOException
+     */
+    private void buildForClass(ArchiveFileEntry fileInfo, String source) throws IOException
+    {
+    	ClassFileInfo classInfo = Utils.createFully(fileInfo.getArchiveFilePath(), fileInfo.getEntryFilePath(), fileInfo.getFileTime(), fileInfo.getFileSize());
+
+        String nodeString = "<html><font color='#007fae'>%s</font></html>";
+
+        DefaultMutableTreeNode classNode        = new DefaultMutableTreeNode(String.format(nodeString, "Class Information"));
+        DefaultMutableTreeNode interfacesNode   = new DefaultMutableTreeNode(String.format(nodeString, "Implemented Interfaces"));
+        DefaultMutableTreeNode constructorsNode = new DefaultMutableTreeNode(String.format(nodeString, "Constructors"));
+        DefaultMutableTreeNode fieldsNode       = new DefaultMutableTreeNode(String.format(nodeString, "Fields"));
+        DefaultMutableTreeNode methodsNode      = new DefaultMutableTreeNode(String.format(nodeString, "Methods"));
+
+        nodeString = "<html><font color='#0000aa'>%s:</font> %s</html>";
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(String.format(nodeString, "Class", classInfo.getClassName()));
+        root.add(classNode);
+        root.add(interfacesNode);
+        root.add(constructorsNode);
+        root.add(fieldsNode);
+        root.add(methodsNode);
+
+        JTree tree = new JTree();
+
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer)tree.getCellRenderer();
+        renderer.setFont(new Font("Monospaced", Font.PLAIN, 14));
+
+        classNode.add(new DefaultMutableTreeNode(String.format(nodeString, "Jar File", classInfo.getJarFileName())));
+        classNode.add(new DefaultMutableTreeNode(String.format(nodeString, "Superclass", classInfo.getSuperclass())));
+        classNode.add(new DefaultMutableTreeNode(String.format(nodeString, "Modifiers", classInfo.getModifiers())));
+
+        ((DefaultTreeModel)tree.getModel()).setRoot(root);
+
+        // interfaces
+        String[] interfacesArray = classInfo.getInterfaces();
+        for (int i = 0; i < interfacesArray.length; i++)
+        {
+            String interfaceName = interfacesArray[i];
+            interfacesNode.add(new DefaultMutableTreeNode(interfaceName));
+        }
+
+        // constructors
+        List<String> constructorList = classInfo.getConstructors();
+        for (int i = 0; i < constructorList.size(); i++)
+        {
+            String constructor = constructorList.get(i);
+            constructorsNode.add(new DefaultMutableTreeNode(constructor));
+        }
+
+        // methods
+        List<String> methodsList = classInfo.getMethods();
+        for (int i = 0; i < methodsList.size(); i++)
+        {
+            String method = methodsList.get(i);
+            methodsNode.add(new DefaultMutableTreeNode(method));
+        }
+
+        // fields
+        String[] fieldsList = classInfo.getFields();
+        for (int i = 0; i < fieldsList.length; i++)
+        {
+            String field = fieldsList[i];
+            fieldsNode.add(new DefaultMutableTreeNode(field));
+        }
+
+        for (int i = 0; i < tree.getRowCount(); i++)
+        {
+            tree.expandRow(i);
+        }
+
+        JTextArea sourceArea = new JTextArea(source);
+        sourceArea.setEditable(false);
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.add("Source", new JScrollPane(sourceArea));
+        tabbedPane.add("Outline", new JScrollPane(tree));
+
+        sourceArea.setFont(new Font("Monospaced", Font.PLAIN, sourceArea.getFont().getSize()));
+        this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    /**
      * Builds UI for display of image.
      *
      * @param image image content.
@@ -194,5 +327,93 @@ public class ResourceExplorer extends HudWindow
     {
         String tmp = selectedValue.toLowerCase();
         return tmp.endsWith(".gif") || tmp.endsWith(".jpg") || tmp.endsWith(".jpeg")  || tmp.endsWith(".png");
+    }
+
+	/** */
+    public String decompile(File file)
+    {
+        String result = null;
+        try
+        {
+        	String path = this.getClass().getResource("/" + this.getClass().getName().replace('.', '/') + ".class").toURI().toString();
+        	path = path.replaceFirst("file:", "").replaceFirst("jar:", "");
+        	path = path.substring(0, path.lastIndexOf("Jarzilla") + 8);
+        	path = path + ".app/Contents/Resources/jad";
+
+            ProcessBuilder p = new ProcessBuilder(path, "-p", file.getCanonicalPath());
+            Process proc = p.start();
+
+            ProcessReader reader = new ProcessReader(proc.getInputStream());
+            reader.start();
+            proc.waitFor();
+            result = reader.getString();
+
+            if (result != null && result.indexOf("\n\n") != -1)
+            {
+            	result = result.substring(result.indexOf("\n\n") + "\n\n".length(), result.length());
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+	/** */
+    private class ProcessReader extends Thread
+    {
+        private BufferedReader reader;
+        private String string;
+        private boolean done;
+
+        /** */
+        public ProcessReader(InputStream stream)
+        {
+            super();
+            done = false;
+            reader = new BufferedReader(new InputStreamReader(stream));
+        }
+
+        @Override
+		public void run()
+        {
+        	StringBuilder sb = new StringBuilder();
+            try
+            {
+            	String line = null;
+                while ((line = reader.readLine()) != null)
+                {
+                    if ("{".equals(line.trim()) && sb.charAt(sb.length() - 1) == '\n')
+                    {
+                        line = line.trim();
+                        sb.deleteCharAt(sb.length() - 1);
+                        sb.append(" ");
+                    }
+                    sb.append(line);
+                    sb.append("\n");
+                }
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+            string = sb.toString();
+            done = true;
+        }
+
+        /** */
+        public String getString()
+        {
+            while (!done)
+            {
+                try
+                {
+                    Thread.sleep(50L);
+                }
+                catch(Exception e) { }
+            }
+            return string;
+        }
     }
 }
