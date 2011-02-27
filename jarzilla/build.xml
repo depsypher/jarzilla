@@ -104,7 +104,7 @@ Jarzilla
 		<exec executable="cp"><arg line="-r ${basedir}/dist/Jarzilla.app /Volumes/Jarzilla"/></exec>
 		<exec executable="hdiutil"><arg line="detach /Volumes/Jarzilla"/></exec>
 		<exec executable="hdiutil" dir="${basedir}/dist">
-			<arg line='convert "template.dmg" -format UDZO -imagekey zlib-level=9 -o "Jarzilla.dmg"' />
+			<arg line='convert "template.dmg" -format UDZO -imagekey zlib-level=9 -o "Jarzilla-${jarzilla.version}.dmg"' />
 		</exec>
 
 		<input message="Publishing to googlecode: continue (y/n)?"
