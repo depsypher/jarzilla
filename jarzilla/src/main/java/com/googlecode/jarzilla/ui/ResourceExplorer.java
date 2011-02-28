@@ -352,7 +352,7 @@ public class ResourceExplorer extends HudWindow
             	System.out.println("could not run jad, setting permissions to executable");
 
             	// the first time after the user has auto-updated the jad
-            	// executable will not have executable persmissions yet
+            	// executable will not have executable permissions yet
             	Process chmod = new ProcessBuilder("chmod", "755", path).start();
             	chmod.waitFor();
 
