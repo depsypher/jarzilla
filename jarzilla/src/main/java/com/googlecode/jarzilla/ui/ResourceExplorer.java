@@ -341,7 +341,23 @@ public class ResourceExplorer extends HudWindow
         	path = path + ".app/Contents/Resources/jad";
 
             ProcessBuilder p = new ProcessBuilder(path, "-p", file.getCanonicalPath());
-            Process proc = p.start();
+            Process proc = null;
+
+            try
+            {
+            	proc = p.start();
+            }
+            catch (IOException e)
+            {
+            	System.out.println("could not run jad, setting permissions to executable");
+
+            	// the first time after the user has auto-updated the jad
+            	// executable will not have executable persmissions yet
+            	Process chmod = new ProcessBuilder("chmod", "755", path).start();
+            	chmod.waitFor();
+
+            	proc = p.start();
+            }
 
             ProcessReader reader = new ProcessReader(proc.getInputStream());
             reader.start();
