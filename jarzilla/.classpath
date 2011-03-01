@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/runtime/quaqua-filechooser-only.jar"/>
 	<classpathentry kind="lib" path="lib/runtime/swingx-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/runtime/schlepit.jar"/>
+	<classpathentry kind="lib" path="lib/runtime/jsyntaxpane-0.9.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

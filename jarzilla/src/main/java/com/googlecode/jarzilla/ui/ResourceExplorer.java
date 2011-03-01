@@ -39,6 +39,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
+import jsyntaxpane.DefaultSyntaxKit;
+
 import com.explodingpixels.macwidgets.HudWidgetFactory;
 import com.explodingpixels.macwidgets.HudWindow;
 import com.googlecode.jarzilla.core.ArchiveFileEntry;
@@ -291,14 +293,18 @@ public class ResourceExplorer extends HudWindow
             tree.expandRow(i);
         }
 
-        JTextArea sourceArea = new JTextArea(source);
-        sourceArea.setEditable(false);
+        DefaultSyntaxKit.initKit();
+
+        final JEditorPane sourceArea = new JEditorPane();
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Source", new JScrollPane(sourceArea));
         tabbedPane.add("Outline", new JScrollPane(tree));
 
-        sourceArea.setFont(new Font("Monospaced", Font.PLAIN, sourceArea.getFont().getSize()));
+        sourceArea.setEditable(false);
+        sourceArea.setContentType("text/java");
+        sourceArea.setText(source);
+
         this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
     }
 
