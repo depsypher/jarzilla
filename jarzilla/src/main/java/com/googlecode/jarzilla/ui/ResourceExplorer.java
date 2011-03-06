@@ -17,6 +17,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,6 +41,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.SyntaxStyles;
 
 import com.explodingpixels.macwidgets.HudWidgetFactory;
 import com.explodingpixels.macwidgets.HudWindow;
@@ -294,6 +296,15 @@ public class ResourceExplorer extends HudWindow
         }
 
         DefaultSyntaxKit.initKit();
+
+        // TODO: read from a properties file
+        Properties styleProps = new Properties();
+        styleProps.put("KEYWORD", "0x7F0055, 0");
+        styleProps.put("KEYWORD2", "0x7F0055, 3");
+        styleProps.put("STRING", "0x2A00FF, 0");
+        styleProps.put("STRING2", "0x2A00FF, 1");
+        styleProps.put("NUMBER", "0x000000, 1");
+        SyntaxStyles.getInstance().mergeStyles(styleProps);
 
         final JEditorPane sourceArea = new JEditorPane();
 
