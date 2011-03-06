@@ -304,6 +304,7 @@ public class ResourceExplorer extends HudWindow
         sourceArea.setEditable(false);
         sourceArea.setContentType("text/java");
         sourceArea.setText(source);
+        sourceArea.setCaretPosition(0);
 
         this.getContentPane().add(tabbedPane, BorderLayout.CENTER);
     }
