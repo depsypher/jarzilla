@@ -5,7 +5,7 @@ Jarzilla
 
 	<property file="google.properties" />
 
-	<property name="jarzilla.version" value="0.1.3" />
+	<property name="jarzilla.version" value="0.1.4" />
 	<property name="jarzilla.mainClass" value="com.googlecode.jarzilla.Jarzilla" />
 
 	<path id="jarzilla.classpath">
