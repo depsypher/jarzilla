@@ -83,11 +83,12 @@ public class ResourceExplorer extends HudWindow
         String jarFileName = fileInfo.getArchiveFilePath();
         String resourceName = fileInfo.getEntryFilePath();
 
-        if (resourceName.toLowerCase().endsWith(".html"))
+        String normalizedName = resourceName.toLowerCase();
+        if (normalizedName.endsWith(".html"))
         {
             this.buildForHTML(jarFileName, resourceName);
         }
-        else if (resourceName.toLowerCase().endsWith(".class"))
+        else if (normalizedName.endsWith(".class"))
         {
 			URL url = new URL("jar:file:" + jarFileName + "!/" + resourceName);
 			BufferedInputStream in = new BufferedInputStream(url.openConnection().getInputStream());
@@ -166,7 +167,7 @@ public class ResourceExplorer extends HudWindow
      */
     private void buildForSimpleResource(String resource)
     {
-        //north panel - toolbar
+        // north panel - toolbar
         monospacedCheckbox = HudWidgetFactory.createHudCheckBox("Monospaced Font");
         monospacedCheckbox.setSelected(true);
         monospacedCheckbox.setForeground(new Color(0xdddddd));
@@ -188,7 +189,7 @@ public class ResourceExplorer extends HudWindow
             }
         });
 
-        //center panel
+        // center panel
         textArea = new JTextArea(resource);
         font = textArea.getFont();
         textArea.setFont(new Font("Monospaced", font.getStyle(), font.getSize()));

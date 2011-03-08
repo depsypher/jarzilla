@@ -21,7 +21,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -228,11 +232,27 @@ public class ResultsPanel extends JPanel
 			JTable t = ResultsPanel.this.table;
 			ArchiveFileEntry classInfo = (ArchiveFileEntry)t.getModel().getValueAt(t.getSelectedRow(), t.getSelectedColumn());
 
-			ResourceExplorer resourceExplorerDialog = new ResourceExplorer(Jarzilla.getFrame(), classInfo);
-			resourceExplorerDialog.getJDialog().setSize(640, 480);
-			resourceExplorerDialog.getJDialog().setLocationRelativeTo(null);
-			resourceExplorerDialog.getJDialog().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			resourceExplorerDialog.getJDialog().setVisible(true);
+			String jarFileName = classInfo.getArchiveFilePath();
+			String resourceName = classInfo.getEntryFilePath();
+			String normalizedName = classInfo.getEntryFilePath().toLowerCase();
+	        if (normalizedName.endsWith(".ear") || normalizedName.endsWith(".jar") ||
+            	normalizedName.endsWith(".sar") || normalizedName.endsWith(".war") ||
+            	normalizedName.endsWith(".zip"))
+            {
+    			URL url = new URL("jar:file:" + jarFileName + "!/" + resourceName);
+
+    			File tempDir = File.createTempFile("jarzilla", normalizedName.substring(normalizedName.length() - 4));
+    			this.extract(url, tempDir.getCanonicalPath());
+    			new ProcessBuilder("open", "-n", tempDir.getCanonicalPath()).start();
+            }
+	        else
+	        {
+				ResourceExplorer resourceExplorerDialog = new ResourceExplorer(Jarzilla.getFrame(), classInfo);
+				resourceExplorerDialog.getJDialog().setSize(640, 480);
+				resourceExplorerDialog.getJDialog().setLocationRelativeTo(null);
+				resourceExplorerDialog.getJDialog().setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				resourceExplorerDialog.getJDialog().setVisible(true);
+	        }
 		}
 		catch (Exception e)
 		{
@@ -380,6 +400,35 @@ public class ResultsPanel extends JPanel
 		public boolean isCellEditable(int row, int column)
 		{
 			return false;
+		}
+	}
+
+	/** */
+	public void extract(URL url, String path)
+	{
+		System.out.println("Extracting: " + path);
+		try
+		{
+			BufferedInputStream ins = new BufferedInputStream(url.openConnection().getInputStream());
+
+			final int BUFFER = 1024;
+			byte data[] = new byte[BUFFER];
+
+			BufferedOutputStream dest = null;
+			int count;
+			FileOutputStream fos = new FileOutputStream(path);
+			dest = new BufferedOutputStream(fos, BUFFER);
+			while ((count = ins.read(data, 0, BUFFER)) != -1)
+			{
+				dest.write(data, 0, count);
+			}
+			dest.flush();
+			fos.close();
+			ins.close();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 }
