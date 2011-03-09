@@ -243,7 +243,7 @@ public class ResultsPanel extends JPanel
 
     			File tempDir = File.createTempFile("jarzilla", normalizedName.substring(normalizedName.length() - 4));
     			this.extract(url, tempDir.getCanonicalPath());
-    			new ProcessBuilder("open", "-n", tempDir.getCanonicalPath()).start();
+    			new ProcessBuilder("open", "-n", "-a", "Jarzilla", tempDir.getCanonicalPath()).start();
             }
 	        else
 	        {
