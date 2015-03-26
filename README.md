@@ -11,13 +11,13 @@
 
 Available for Mac OS X
 
-![Main Window](http://jarzilla.googlecode.com/svn/wiki/images/jarzilla-main-window.png "Main Window")
+![jarzilla-main-window](https://cloud.githubusercontent.com/assets/113138/6840855/8c56547c-d33d-11e4-9a69-21b5de1b36ac.png)
 
-![Details Window](http://jarzilla.googlecode.com/svn/wiki/images/jarzilla-details-window.png "Details Window")
+![jarzilla-details-window](https://cloud.githubusercontent.com/assets/113138/6840863/9f8622ca-d33d-11e4-8fb5-f4de250e2c5e.png)
 
-![HTML Window](http://jarzilla.googlecode.com/svn/wiki/images/jarzilla-html-window.png "HTML Window")
+![jarzilla-html-window](https://cloud.githubusercontent.com/assets/113138/6840865/a6eba4b8-d33d-11e4-8f52-bbcc6b34db36.png)
 
-![Image Window](http://jarzilla.googlecode.com/svn/wiki/images/jarzilla-image-window.png "Image Window")
+![jarzilla-image-window](https://cloud.githubusercontent.com/assets/113138/6840867/af98f9b2-d33d-11e4-8adf-c6da26d3a1da.png)
 
 ### Overview
 Jarzilla allows you to view most kinds of zip files, with a focus on inspecting the contents of java jar files.
