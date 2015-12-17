@@ -3,9 +3,7 @@ Jarzilla
 -->
 <project name="jarzilla" default="dist">
 
-	<property file="google.properties" />
-
-	<property name="jarzilla.version" value="0.1.5" />
+	<property name="jarzilla.version" value="0.1.6" />
 	<property name="jarzilla.mainClass" value="com.googlecode.jarzilla.Jarzilla" />
 
 	<path id="jarzilla.classpath">
@@ -27,7 +25,7 @@ Jarzilla
 	-->
 	<target name="compile" description="Compiles the code">
 		<mkdir dir="build/jarzilla/classes" />
-		<javac srcdir="src/main/java" destdir="build/jarzilla/classes" debug="on" target="1.5" includeantruntime="false">
+		<javac srcdir="src/main/java" destdir="build/jarzilla/classes" debug="on" source="1.7" target="1.7" includeantruntime="false">
 			<classpath refid="jarzilla.classpath" />
 		</javac>
 		<copy todir="build/jarzilla/classes">
@@ -52,51 +50,41 @@ Jarzilla
 				<attribute name="Jarzilla-Version" value="${jarzilla.version}" />
 			</manifest>
 		</jar>
-
 		<property name="appdir" value="dist/Jarzilla.app"/>
-		<mkdir dir="${appdir}/Contents/MacOS"/>
-		<mkdir dir="${appdir}/Contents/Resources/Java"/>
 
-		<copy file="src/main/resources/JavaApplicationStub" todir="${appdir}/Contents/MacOS"/>
-		<exec executable="chmod">
-			<arg value="755" />
-			<arg value="${appdir}/Contents/MacOS/JavaApplicationStub" />
-		</exec>
+		<taskdef name="jarbundler"
+		         classname="net.sourceforge.jarbundler.JarBundler"
+		         classpath="lib/compile/jarbundler-2.5.0.jar" />
 
-		<copy file="src/main/resources/Info.plist" todir="${appdir}/Contents" />
-		<copy file="src/main/resources/jarzilla.icns" todir="${appdir}/Contents/Resources" />
+		<jarbundler
+				dir="dist"
+				name="Jarzilla"
+				shortname="Jarzilla"
+				icon="src/main/resources/jarzilla.icns"
+				stubfile="src/main/resources/universalJavaApplicationStub"
+				useJavaXKey="true"
+				mainclass="${jarzilla.mainClass}"
+				jvmversion="1.7+"
+				signature="JARZ"
+				bundleid="com.googlecode.jarzilla">
 
-		<copy file="src/main/resources/jad" todir="${appdir}/Contents/Resources" />
-		<exec executable="chmod">
-			<arg value="755" />
-			<arg value="${appdir}/Contents/Resources/jad" />
-		</exec>
+			<resourcefilelist dir="src/main/resources" files="jad" />
 
-		<copy file="dist/jarzilla.jar" todir="${appdir}/Contents/Resources/Java" />
-		<copy todir="${appdir}/Contents/Resources/Java">
-			<fileset dir="lib/runtime">
-				<include name="*.jar" />
-				<include name="*.jnilib" />
-			</fileset>
-		</copy>
-		<exec executable="/Developer/Tools/SetFile">
-			<arg value="-a" />
-			<arg value="B" />
-			<arg value="${appdir}" />
-		</exec>
+			<jarfilelist dir="dist" files="jarzilla.jar" />
+			<jarfilelist dir="lib/runtime" files="forms-1.2.1.jar, jsyntaxpane-0.9.4.jar, mac_widgets.jar, quaqua-filechooser-only.jar, schlepit.jar, swingx-1.6.jar" />
 
-		<copy file="src/main/resources/updater/schlepit.properties" todir="${appdir}" />
+			<javafilelist dir="lib/runtime" files="libquaqua.jnilib, libquaqua64.jnilib" />
 
-		<taskdef name="schlepit"
-				classname="com.googlecode.jarzilla.schlepit.build.SchlepItTask"
-				classpath="lib/runtime/schlepit.jar" />
-
-		<zip destfile="dist/update.zip" basedir="${appdir}" />
-		<schlepit version="${jarzilla.version}" fileName="jarzilla.schlepit" source="dist/update.zip" dest="dist/" />
+			<documenttype name="Jar file"
+			              extensions="jar ear sar war zip"
+			              utis="com.sun.java-archive com.pkware.zip-archive"
+			              iconFile="src/main/resources/jarzilla.icns"
+			              role="Viewer"/>
+		</jarbundler>
 	</target>
 
 	<!--
-	Publish the latest build to googlecode
+	Publish the latest build as dmg
 	-->
 	<target name="publish" depends="clean, dist">
 		<!-- create dmg -->
@@ -107,35 +95,6 @@ Jarzilla
 		<exec executable="hdiutil" dir="${basedir}/dist">
 			<arg line='convert "template.dmg" -format UDZO -imagekey zlib-level=9 -o "Jarzilla-${jarzilla.version}.dmg"' />
 		</exec>
-
-		<input message="Publishing to googlecode: continue (y/n)?"
-				validargs="y,n"
-				addproperty="do.publish" />
-
-		<condition property="do.abort">
-			<equals arg1="n" arg2="${do.publish}"/>
-		</condition>
-		<fail if="do.abort">Publishing aborted.</fail>
-
-		<taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask" classpath="lib/compile/ant-googlecode-0.0.2.jar" name="gcupload"/>
-		<property file="google.properties" />
-		<gcupload
-				username="${google.username}"
-				password="${google.password}"
-				projectname="jarzilla"
-				filename="dist/jarzilla.schlepit"
-				targetfilename="jarzilla.schlepit"
-				summary="Jarzilla auto update package for version ${jarzilla.version}"
-				verbose="true" />
-		<gcupload
-				username="${google.username}"
-				password="${google.password}"
-				projectname="jarzilla"
-				filename="dist/jarzilla-${jarzilla.version}.dmg"
-				targetfilename="Jarzilla-${jarzilla.version}.dmg"
-				summary="Jarzilla version ${jarzilla.version}"
-				labels="Featured"
-				verbose="true" />
 	</target>
 
 </project>

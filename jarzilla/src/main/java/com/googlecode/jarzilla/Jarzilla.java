@@ -4,40 +4,7 @@
  */
 package com.googlecode.jarzilla;
 
-import java.awt.BorderLayout;
-import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-
 import ch.randelshofer.quaqua.QuaquaManager;
-
 import com.apple.eawt.AppEvent.OpenFilesEvent;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.Application;
@@ -54,14 +21,27 @@ import com.explodingpixels.macwidgets.UnifiedToolBar;
 import com.googlecode.jarzilla.core.ArchiveFile;
 import com.googlecode.jarzilla.core.ArchiveFileEntry;
 import com.googlecode.jarzilla.core.Utils;
-import com.googlecode.jarzilla.schlepit.Schlepper;
-import com.googlecode.jarzilla.schlepit.net.DownloadObserver;
-import com.googlecode.jarzilla.schlepit.net.Downloader;
 import com.googlecode.jarzilla.ui.DetailsMessageBox;
 import com.googlecode.jarzilla.ui.HelpDialog;
 import com.googlecode.jarzilla.ui.JarzillaBottomBar;
 import com.googlecode.jarzilla.ui.ResultsPanel;
-import com.googlecode.jarzilla.ui.UpdateDialog;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Jarzilla application class
@@ -251,129 +231,6 @@ public class Jarzilla
 					System.exit(0);
 				}
 			});
-		}
-
-		// update
-		try
-		{
-			Jarzilla.update();
-		}
-		catch (Exception e)
-		{
-			System.out.println("Update error: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * @throws Exception
-	 */
-	public static void update() throws Exception
-	{
-		Schlepper schlepper = new Schlepper();
-		String path = schlepper.getDirectory(Jarzilla.class);
-		path = path.substring(0, path.indexOf("Jarzilla.app") + 13);
-		String propertiesPath = path + "schlepit.properties";
-
-		Properties props = schlepper.getProperties(propertiesPath);
-		String version = props.getProperty("version");
-		String updateUrl = props.getProperty("updateUrl");
-		String lastUpdateCheck = props.getProperty("lastUpdateCheck");
-
-		System.out.println(path);
-		System.out.println("Version: " + version);
-		System.out.println("UpdateUrl: " + updateUrl);
-		System.out.println("lastUpdateCheck: " + lastUpdateCheck);
-
-		long millis = 0;
-		if (lastUpdateCheck != null)
-		{
-			try
-			{
-				millis = Long.valueOf(lastUpdateCheck);
-			}
-			catch (Exception e)
-			{
-				// ignore
-			}
-		}
-
-		long elapsed = new Date().getTime() - millis;
-
-		// update last update check time once a month
-		if (millis == 0 || elapsed >= 2628000000L) {
-			props.setProperty("lastUpdateCheck", Long.valueOf(new Date().getTime()).toString());
-			schlepper.setProperties(propertiesPath, props);
-		}
-
-		// if a month hasn't passed yet, don't check for update
-		if (elapsed < 2628000000L)
-		{
-			System.out.println("Canceling update check, not enough time elapsed: " + elapsed);
-			return;
-		}
-
-		DownloadObserver observer = new DownloadObserver()
-		{
-			private UpdateDialog updateDialog = new UpdateDialog();
-
-			@Override
-			public void onUpdateAvailable(final Downloader downloader)
-			{
-				updateDialog.setOkActionListener(new ActionListener()
-				{
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						updateDialog.setProgressVisible(true);
-						synchronized(downloader)
-						{
-							downloader.notify();
-						}
-					}
-				});
-				updateDialog.setNotNowActionListener(new ActionListener()
-				{
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						updateDialog.dispose();
-					}
-				});
-				updateDialog.setVisible(true);
-			}
-
-			@Override
-			public void onUpdateComplete(final Downloader downloader)
-			{
-				updateDialog.confirmRestart();
-				updateDialog.setRestartActionListener(new ActionListener()
-				{
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						synchronized(downloader)
-						{
-							downloader.notify();
-						}
-						updateDialog.dispose();
-					}
-				});
-			}
-
-			@Override
-			public boolean downloadProgress(int percentDone, long secondsLeft)
-			{
-				updateDialog.setProgress(percentDone);
-				return true;
-			}
-		};
-
-		boolean updated = schlepper.schlep(version, updateUrl, path, observer);
-		if (updated)
-		{
-			new ProcessBuilder("open", "-n", path).start();
-			Thread.sleep(500);
-			System.exit(0);
 		}
 	}
 
