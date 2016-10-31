@@ -2,7 +2,9 @@
 ### Jarzilla allows you to view the contents of any jar, ear, sar, war or zip file.
 <br/>
 
-**NOTE** Running Jarzilla on Mountain Lion currently requires the following steps:
+[Download Jarzilla-0.1.6](https://github.com/depsypher/jarzilla/releases/download/v0.1.6/Jarzilla-0.1.6.dmg)
+
+**NOTE** Running Jarzilla currently requires the following steps:
 
   1. Open Security & Privacy Preferences
   2. Change setting "Allow applications downloaded from" to setting "Anywhere"
